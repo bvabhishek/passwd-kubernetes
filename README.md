@@ -12,10 +12,6 @@ passwd-kubernetes/
 ├── namespace.yaml # Namespace definition
 └── vuln-pod.yaml # Pod definition using the custom image
 
-yaml
-Copy
-Edit
-
 ---
 
 ## 🐳 Step 1: Build & Push Docker Image
@@ -26,9 +22,7 @@ Make sure you're in the `passwd-kubernetes/` directory.
 docker build -t abhishekbv/passwd-lab:latest .
 docker push abhishekbv/passwd-lab:latest
 🛠️ Step 2: Create Kubernetes Namespace
-yaml
-Copy
-Edit
+
 # namespace.yaml
 apiVersion: v1
 kind: Namespace
@@ -36,14 +30,9 @@ metadata:
   name: passwd-lab
 Apply it:
 
-bash
-Copy
-Edit
+
 kubectl apply -f namespace.yaml
 📦 Step 3: Create Vulnerable Pod
-yaml
-Copy
-Edit
 # vuln-pod.yaml
 apiVersion: v1
 kind: Pod
@@ -61,22 +50,14 @@ spec:
   restartPolicy: Always
 Apply the pod:
 
-bash
-Copy
-Edit
 kubectl apply -f vuln-pod.yaml
 🔍 Step 4: Access the Pod
-bash
-Copy
-Edit
+
 kubectl get pods -n passwd-lab
 kubectl exec -it -n passwd-lab vuln-passwd-pod -- /bin/bash
 📝 Step 5: Inspect File Permissions
 Inside the pod:
 
-bash
-Copy
-Edit
 ls -la /etc/passwd
 ls -la /etc/shadow
 ✅ If both files are world-writable, the container is vulnerable to privilege escalation.
@@ -84,15 +65,9 @@ ls -la /etc/shadow
 💥 Step 6: Run the Exploit
 Still inside the pod:
 
-bash
-Copy
-Edit
 python3 passwd.py
 When prompted, enter:
 
-bash
-Copy
-Edit
 password123
 🔐 What Just Happened?
 The script adds a fake user hacked with UID 0 to /etc/passwd and /etc/shadow.
@@ -105,13 +80,9 @@ Demonstrates poor container hardening and potential container escape risk.
 This lab shows the critical risk of writable sensitive files inside containers. When deployed in Kubernetes (even as non-root), misconfigured containers can lead to root-level access and lateral movement if proper isolation is not enforced.
 
 📌 Docker Image Used
-text
-Copy
-Edit
+
 DockerHub: abhishekbv/passwd-lab:latest
 🧼 Cleanup
-bash
-Copy
-Edit
+
 kubectl delete pod vuln-passwd-pod -n passwd-lab
 kubectl delete ns passwd-lab
