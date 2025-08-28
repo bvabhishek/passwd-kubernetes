@@ -6,7 +6,8 @@ metadata:
 spec:
   containers:
   - name: passwd-container
-    image: abhishekbv/passwd-lab:latest
+    image: passwd-lab:latest
+    imagePullPolicy: Never
     securityContext:
       runAsUser: 1000
       runAsGroup: 1000

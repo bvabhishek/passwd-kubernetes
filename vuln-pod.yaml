@@ -7,6 +7,7 @@ spec:
   containers:
   - name: passwd-container
     image: passwd-lab:latest
+    imagePullPolicy: Never
     securityContext:
       runAsUser: 1000
       runAsGroup: 1000
