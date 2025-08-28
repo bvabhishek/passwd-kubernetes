@@ -1,0 +1,27 @@
+# File: Dockerfile-busybox
+FROM busybox:latest
+
+# Install basic tools
+RUN apk add --no-cache \
+    bash \
+    python3 \
+    py3-pip \
+    shadow \
+    && rm -rf /var/cache/apk/*
+
+# Install Python crypt module
+RUN pip3 install --no-cache-dir passlib
+
+# Create attacker user
+RUN adduser -D -s /bin/bash attacker && \
+    echo "attacker:attacker" | chpasswd
+
+# Dangerous permissions - make files world writable
+RUN chmod 666 /etc/passwd && chmod 666 /etc/shadow
+
+USER attacker
+WORKDIR /home/attacker
+
+COPY passwd_busybox.py .
+
+CMD ["/bin/bash"] 

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vuln-passwd-pod-busybox
+  namespace: passwd-lab
+spec:
+  containers:
+  - name: passwd-container
+    image: abhishekbv/passwd-lab-busybox:latest
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      allowPrivilegeEscalation: true
+    command: ["/bin/bash", "-c", "sleep infinity"] 
