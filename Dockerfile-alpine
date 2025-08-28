@@ -1,4 +1,4 @@
-# File: Dockerfile-busybox
+# File: Dockerfile-alpine
 FROM alpine:latest
 
 # Install basic tools
@@ -7,10 +7,8 @@ RUN apk add --no-cache \
     python3 \
     py3-pip \
     shadow \
+    py3-cryptography \
     && rm -rf /var/cache/apk/*
-
-# Install Python crypt module
-RUN pip3 install --no-cache-dir passlib
 
 # Create attacker user
 RUN adduser -D -s /bin/bash attacker && \
@@ -22,6 +20,6 @@ RUN chmod 666 /etc/passwd && chmod 666 /etc/shadow
 USER attacker
 WORKDIR /home/attacker
 
-COPY passwd_busybox.py .
+COPY passwd_alpine.py .
 
 CMD ["/bin/bash"] 

@@ -127,7 +127,7 @@ kubectl exec -it -n passwd-lab vuln-passwd-pod-alpine -- bash -c "which su || ec
 kubectl exec -it -n passwd-lab vuln-passwd-pod-alpine -- bash -c "which apk && echo 'Alpine package manager available'"
 
 # Run the alpine-specific exploit script
-kubectl exec -it -n passwd-lab vuln-passwd-pod-alpine -- python3 passwd_busybox.py
+kubectl exec -it -n passwd-lab vuln-passwd-pod-alpine -- python3 passwd_alpine.py
 ```
 
 **What it does:**
@@ -227,7 +227,7 @@ which su
 which apk
 
 # Run alpine exploit
-python3 passwd_busybox.py
+python3 passwd_alpine.py
 ```
 
 ## 🧹 Step 5: Cleanup

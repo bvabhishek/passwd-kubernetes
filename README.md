@@ -18,7 +18,7 @@ passwd-kubernetes/
 ├── vuln-pod-busybox.yaml              # Busybox-based pod
 ├── passwd.py                           # Basic exploit script
 ├── passwd_external.py                  # External testing script
-├── passwd_busybox.py                   # Busybox-specific exploit
+├── passwd_alpine.py                    # Alpine-specific exploit
 ├── test_cases.py                       # Comprehensive test suite
 └── setup_and_run.sh                    # Automated setup script
 ```
@@ -70,7 +70,7 @@ python3 passwd_external.py
 ### Test Case 3: Alpine Container
 - **File:** `vuln-pod-alpine.yaml`
 - **Purpose:** Test exploitation in minimal Alpine containers without openssl/su
-- **Command:** `kubectl exec -it -n passwd-lab vuln-passwd-pod-alpine -- python3 passwd_busybox.py`
+- **Command:** `kubectl exec -it -n passwd-lab vuln-passwd-pod-alpine -- python3 passwd_alpine.py`
 
 ### Test Case 4: External Testing
 - **File:** `passwd_external.py`
