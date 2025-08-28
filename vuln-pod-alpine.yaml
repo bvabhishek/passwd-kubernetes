@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: vuln-passwd-pod-busybox
+  name: vuln-passwd-pod-alpine
   namespace: passwd-lab
 spec:
   containers:
   - name: passwd-container
-    image: passwd-lab-busybox:latest
+    image: passwd-lab-alpine:latest
     securityContext:
       runAsUser: 1000
       runAsGroup: 1000

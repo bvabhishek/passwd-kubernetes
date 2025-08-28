@@ -58,9 +58,9 @@ build_images() {
     print_status "Building standard vulnerable image..."
     docker build -t passwd-lab:latest .
     
-    # Build busybox-based image
-    print_status "Building busybox-based image..."
-    docker build -f Dockerfile-busybox -t passwd-lab-busybox:latest .
+    # Build alpine-based image
+    print_status "Building alpine-based image..."
+    docker build -f Dockerfile-alpine -t passwd-lab-alpine:latest .
     
     print_status "Docker images built successfully"
 }
@@ -74,7 +74,7 @@ push_images() {
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         docker push passwd-lab:latest
-        docker push passwd-lab-busybox:latest
+        docker push passwd-lab-alpine:latest
         print_status "Images pushed successfully"
     else
         print_warning "Skipping image push. Using local images."
@@ -99,15 +99,15 @@ deploy_pods() {
     print_status "Deploying no-capabilities pod..."
     kubectl apply -f vuln-pod-no-capabilities.yaml
     
-    # Deploy busybox pod
-    print_status "Deploying busybox pod..."
-    kubectl apply -f vuln-pod-busybox.yaml
+    # Deploy alpine pod
+    print_status "Deploying alpine pod..."
+    kubectl apply -f vuln-pod-alpine.yaml
     
     # Wait for pods to be ready
     print_status "Waiting for pods to be ready..."
     kubectl wait --for=condition=Ready pod/vuln-passwd-pod -n ${NAMESPACE} --timeout=60s
     kubectl wait --for=condition=Ready pod/vuln-passwd-pod-no-caps -n ${NAMESPACE} --timeout=60s
-    kubectl wait --for=condition=Ready pod/vuln-passwd-pod-busybox -n ${NAMESPACE} --timeout=60s
+    kubectl wait --for=condition=Ready pod/vuln-passwd-pod-alpine -n ${NAMESPACE} --timeout=60s
     
     print_status "All pods are ready"
 }

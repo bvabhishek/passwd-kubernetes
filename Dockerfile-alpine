@@ -1,5 +1,5 @@
 # File: Dockerfile-busybox
-FROM busybox:latest
+FROM alpine:latest
 
 # Install basic tools
 RUN apk add --no-cache \

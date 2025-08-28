@@ -18,17 +18,17 @@ Before starting, ensure you have:
 docker build -t abhishekbv/passwd-lab:latest .
 ```
 
-### 1.2 Build Busybox-based Image
+### 1.2 Build Alpine-based Image
 ```bash
-# Build the busybox-based image
-docker build -f Dockerfile-busybox -t abhishekbv/passwd-lab-busybox:latest .
+# Build the alpine-based image
+docker build -f Dockerfile-alpine -t abhishekbv/passwd-lab-alpine:latest .
 ```
 
 ### 1.3 (Optional) Push Images to Registry
 ```bash
 # If you want to push to Docker Hub
 docker push abhishekbv/passwd-lab:latest
-docker push abhishekbv/passwd-lab-busybox:latest
+docker push abhishekbv/passwd-lab-alpine:latest
 ```
 
 ## 🏗️ Step 2: Create Kubernetes Namespace
@@ -50,9 +50,9 @@ kubectl apply -f vuln-pod.yaml
 kubectl apply -f vuln-pod-no-capabilities.yaml
 ```
 
-### 3.3 Deploy Busybox Pod
+### 3.3 Deploy Alpine Pod
 ```bash
-kubectl apply -f vuln-pod-busybox.yaml
+kubectl apply -f vuln-pod-alpine.yaml
 ```
 
 ### 3.4 Verify Pods are Running
@@ -116,22 +116,22 @@ kubectl exec -it -n passwd-lab vuln-passwd-pod-no-caps -- python3 passwd.py
 - Privilege escalation should still work (demonstrating that dropping capabilities alone doesn't prevent this attack)
 - This shows the importance of proper file permissions
 
-### Test Case 3: Busybox Container (No OpenSSL, No SU)
+### Test Case 3: Alpine Container (No OpenSSL, No SU)
 
 This tests exploitation in a minimal container:
 
 ```bash
 # Check what tools are available
-kubectl exec -it -n passwd-lab vuln-passwd-pod-busybox -- bash -c "which openssl || echo 'No openssl'"
-kubectl exec -it -n passwd-lab vuln-passwd-pod-busybox -- bash -c "which su || echo 'No su'"
-kubectl exec -it -n passwd-lab vuln-passwd-pod-busybox -- bash -c "which busybox && echo 'Busybox available'"
+kubectl exec -it -n passwd-lab vuln-passwd-pod-alpine -- bash -c "which openssl || echo 'No openssl'"
+kubectl exec -it -n passwd-lab vuln-passwd-pod-alpine -- bash -c "which su || echo 'No su'"
+kubectl exec -it -n passwd-lab vuln-passwd-pod-alpine -- bash -c "which apk && echo 'Alpine package manager available'"
 
-# Run the busybox-specific exploit script
-kubectl exec -it -n passwd-lab vuln-passwd-pod-busybox -- python3 passwd_busybox.py
+# Run the alpine-specific exploit script
+kubectl exec -it -n passwd-lab vuln-passwd-pod-alpine -- python3 passwd_busybox.py
 ```
 
 **What it does:**
-- Detects available tools (busybox, openssl, su)
+- Detects available tools (alpine, openssl, su)
 - Uses alternative methods for password hash generation
 - Handles missing `su` command gracefully
 - Tests privilege escalation with limited tools
@@ -216,17 +216,17 @@ ls -la /etc/passwd
 python3 passwd.py
 ```
 
-### Manual Test 3: Busybox Container
+### Manual Test 3: Alpine Container
 ```bash
-# Access the busybox container
-kubectl exec -it -n passwd-lab vuln-passwd-pod-busybox -- /bin/bash
+# Access the alpine container
+kubectl exec -it -n passwd-lab vuln-passwd-pod-alpine -- /bin/bash
 
 # Check available tools
 which openssl
 which su
-which busybox
+which apk
 
-# Run busybox exploit
+# Run alpine exploit
 python3 passwd_busybox.py
 ```
 
@@ -286,13 +286,13 @@ kubectl logs vuln-passwd-pod -n passwd-lab
 |-----------|----------------|---------------------|
 | Standard Pod | ✅ Privilege escalation successful | Container is vulnerable |
 | No Capabilities | ✅ Privilege escalation still works | Dropping capabilities alone is insufficient |
-| Busybox Container | ✅ Privilege escalation successful | Minimal containers are still vulnerable |
+| Alpine Container | ✅ Privilege escalation successful | Minimal containers are still vulnerable |
 | External Script | ✅ Remote exploitation possible | Attack can be performed from outside |
 
 ## 🔒 Security Lessons
 
 1. **File permissions matter more than capabilities** - Even with all capabilities dropped, writable `/etc/passwd` allows privilege escalation
-2. **Container minimalism doesn't prevent attacks** - Busybox containers can still be exploited
+2. **Container minimalism doesn't prevent attacks** - Alpine containers can still be exploited
 3. **External access is dangerous** - Attacks can be performed remotely via kubectl
 4. **Defense in depth is crucial** - Multiple security layers are needed
 

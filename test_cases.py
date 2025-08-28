@@ -115,12 +115,12 @@ class PrivilegeEscalationTester:
         
         return True
     
-    def test_case_3_busybox_container(self):
-        """Test Case 3: Busybox-based container"""
-        print("\n🔍 Test Case 3: Busybox Container")
+    def test_case_3_alpine_container(self):
+        """Test Case 3: Alpine-based container"""
+        print("\n🔍 Test Case 3: Alpine Container")
         print("=" * 50)
         
-        pod_name = "vuln-passwd-pod-busybox"
+        pod_name = "vuln-passwd-pod-alpine"
         
         # Check if pod exists
         if not self.check_pod_exists(pod_name):
@@ -247,7 +247,7 @@ class PrivilegeEscalationTester:
         test_functions = [
             self.test_case_1_vulnerable_pod,
             self.test_case_2_no_capabilities,
-            self.test_case_3_busybox_container,
+            self.test_case_3_alpine_container,
             self.test_case_4_conditional_scenarios
         ]
         

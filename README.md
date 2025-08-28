@@ -12,7 +12,7 @@ This lab shows how misconfigured container permissions can lead to privilege esc
 passwd-kubernetes/
 ├── README.md                           # This file
 ├── Dockerfile                          # Standard vulnerable container
-├── Dockerfile-busybox                  # Busybox-based vulnerable container
+├── Dockerfile-alpine                   # Alpine-based vulnerable container
 ├── vuln-pod.yaml                      # Standard vulnerable pod
 ├── vuln-pod-no-capabilities.yaml      # Pod with all capabilities dropped
 ├── vuln-pod-busybox.yaml              # Busybox-based pod
@@ -30,8 +30,8 @@ passwd-kubernetes/
 # Build standard vulnerable image
 docker build -t passwd-lab:latest .
 
-# Build busybox-based image
-docker build -f Dockerfile-busybox -t passwd-lab-busybox:latest .
+# Build alpine-based image
+docker build -f Dockerfile-alpine -t passwd-lab-alpine:latest .
 ```
 
 ### 2. Create Kubernetes Namespace
@@ -43,7 +43,7 @@ kubectl create namespace passwd-lab
 ```bash
 kubectl apply -f vuln-pod.yaml
 kubectl apply -f vuln-pod-no-capabilities.yaml
-kubectl apply -f vuln-pod-busybox.yaml
+kubectl apply -f vuln-pod-alpine.yaml
 ```
 
 ### 4. Run Tests
@@ -67,10 +67,10 @@ python3 passwd_external.py
 - **Purpose:** Test if dropping capabilities prevents privilege escalation
 - **Command:** `kubectl exec -it -n passwd-lab vuln-passwd-pod-no-caps -- python3 passwd.py`
 
-### Test Case 3: Busybox Container
-- **File:** `vuln-pod-busybox.yaml`
-- **Purpose:** Test exploitation in minimal containers without openssl/su
-- **Command:** `kubectl exec -it -n passwd-lab vuln-passwd-pod-busybox -- python3 passwd_busybox.py`
+### Test Case 3: Alpine Container
+- **File:** `vuln-pod-alpine.yaml`
+- **Purpose:** Test exploitation in minimal Alpine containers without openssl/su
+- **Command:** `kubectl exec -it -n passwd-lab vuln-passwd-pod-alpine -- python3 passwd_busybox.py`
 
 ### Test Case 4: External Testing
 - **File:** `passwd_external.py`
