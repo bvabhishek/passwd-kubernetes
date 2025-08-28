@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 NAMESPACE="passwd-lab"
-REGISTRY="abhishekbv"
+REGISTRY=""
 
 echo -e "${BLUE}🔓 Kubernetes /etc/passwd Privilege Escalation Lab${NC}"
 echo "=================================================="
@@ -56,11 +56,11 @@ build_images() {
     
     # Build standard vulnerable image
     print_status "Building standard vulnerable image..."
-    docker build -t ${REGISTRY}/passwd-lab:latest .
+    docker build -t passwd-lab:latest .
     
     # Build busybox-based image
     print_status "Building busybox-based image..."
-    docker build -f Dockerfile-busybox -t ${REGISTRY}/passwd-lab-busybox:latest .
+    docker build -f Dockerfile-busybox -t passwd-lab-busybox:latest .
     
     print_status "Docker images built successfully"
 }
@@ -73,8 +73,8 @@ push_images() {
     read -p "Do you want to push images to Docker Hub? (y/n): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        docker push ${REGISTRY}/passwd-lab:latest
-        docker push ${REGISTRY}/passwd-lab-busybox:latest
+        docker push passwd-lab:latest
+        docker push passwd-lab-busybox:latest
         print_status "Images pushed successfully"
     else
         print_warning "Skipping image push. Using local images."

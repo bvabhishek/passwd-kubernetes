@@ -1,88 +1,99 @@
-# ☸️ Kubernetes Privilege Escalation Lab: `/etc/passwd` Exploitation
+# 🔓 Kubernetes /etc/passwd Privilege Escalation Lab
 
-This lab demonstrates how writable permissions on `/etc/passwd` and `/etc/shadow` inside a container can lead to **privilege escalation** in a Kubernetes environment.
+A comprehensive lab demonstrating privilege escalation vulnerabilities in Kubernetes containers through writable `/etc/passwd` and `/etc/shadow` files.
 
----
+## 🎯 What This Lab Demonstrates
+
+This lab shows how misconfigured container permissions can lead to privilege escalation, even when security measures like dropping capabilities are implemented.
 
 ## 📁 Project Structure
 
+```
 passwd-kubernetes/
-├── Dockerfile # Builds the vulnerable image
-├── passwd.py # Exploit script
-├── namespace.yaml # Namespace definition
-└── vuln-pod.yaml # Pod definition using the custom image
+├── README.md                           # This file
+├── Dockerfile                          # Standard vulnerable container
+├── Dockerfile-busybox                  # Busybox-based vulnerable container
+├── vuln-pod.yaml                      # Standard vulnerable pod
+├── vuln-pod-no-capabilities.yaml      # Pod with all capabilities dropped
+├── vuln-pod-busybox.yaml              # Busybox-based pod
+├── passwd.py                           # Basic exploit script
+├── passwd_external.py                  # External testing script
+├── passwd_busybox.py                   # Busybox-specific exploit
+├── test_cases.py                       # Comprehensive test suite
+└── setup_and_run.sh                    # Automated setup script
+```
 
----
+## 🚀 Quick Start
 
-## 🐳 Step 1: Build & Push Docker Image
+### 1. Build Docker Images
+```bash
+# Build standard vulnerable image
+docker build -t passwd-lab:latest .
 
-Make sure you're in the `passwd-kubernetes/` directory.
+# Build busybox-based image
+docker build -f Dockerfile-busybox -t passwd-lab-busybox:latest .
+```
+
+### 2. Create Kubernetes Namespace
+```bash
+kubectl create namespace passwd-lab
+```
+
+### 3. Deploy Test Pods
+```bash
+kubectl apply -f vuln-pod.yaml
+kubectl apply -f vuln-pod-no-capabilities.yaml
+kubectl apply -f vuln-pod-busybox.yaml
+```
+
+### 4. Run Tests
+```bash
+# Run comprehensive test suite
+python3 test_cases.py
+
+# Or run individual tests
+python3 passwd_external.py
+```
+
+## 🧪 Test Cases
+
+### Test Case 1: Standard Vulnerability
+- **File:** `vuln-pod.yaml`
+- **Purpose:** Basic privilege escalation test
+- **Command:** `kubectl exec -it -n passwd-lab vuln-passwd-pod -- python3 passwd.py`
+
+### Test Case 2: No Capabilities
+- **File:** `vuln-pod-no-capabilities.yaml`
+- **Purpose:** Test if dropping capabilities prevents privilege escalation
+- **Command:** `kubectl exec -it -n passwd-lab vuln-passwd-pod-no-caps -- python3 passwd.py`
+
+### Test Case 3: Busybox Container
+- **File:** `vuln-pod-busybox.yaml`
+- **Purpose:** Test exploitation in minimal containers without openssl/su
+- **Command:** `kubectl exec -it -n passwd-lab vuln-passwd-pod-busybox -- python3 passwd_busybox.py`
+
+### Test Case 4: External Testing
+- **File:** `passwd_external.py`
+- **Purpose:** Test privilege escalation from outside the container
+- **Command:** `python3 passwd_external.py`
+
+## 🔒 Security Lessons
+
+1. **File permissions matter more than capabilities** - Dropping capabilities alone doesn't prevent this attack
+2. **Container minimalism doesn't prevent attacks** - Even busybox containers can be exploited
+3. **External access is dangerous** - Attacks can be performed remotely via kubectl
+4. **Defense in depth is crucial** - Multiple security layers are needed
+
+## 🧹 Cleanup
 
 ```bash
-docker build -t abhishekbv/passwd-lab:latest .
-docker push abhishekbv/passwd-lab:latest
-🛠️ Step 2: Create Kubernetes Namespace
+kubectl delete namespace passwd-lab
+```
 
-# namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: passwd-lab
-Apply it:
+## 📚 Detailed Guide
 
+For step-by-step instructions and troubleshooting, see [TEST_CASES_README.md](TEST_CASES_README.md).
 
-kubectl apply -f namespace.yaml
-📦 Step 3: Create Vulnerable Pod
-# vuln-pod.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: vuln-passwd-pod
-  namespace: passwd-lab
-spec:
-  containers:
-    - name: passwd-container
-      image: abhishekbv/passwd-lab:latest
-      command: ["/bin/bash", "-c", "sleep infinity"]
-      securityContext:
-        privileged: true
-        runAsUser: 0
-  restartPolicy: Always
-Apply the pod:
+## ⚠️ Disclaimer
 
-kubectl apply -f vuln-pod.yaml
-🔍 Step 4: Access the Pod
-
-kubectl get pods -n passwd-lab
-kubectl exec -it -n passwd-lab vuln-passwd-pod -- /bin/bash
-📝 Step 5: Inspect File Permissions
-Inside the pod:
-
-ls -la /etc/passwd
-ls -la /etc/shadow
-✅ If both files are world-writable, the container is vulnerable to privilege escalation.
-
-💥 Step 6: Run the Exploit
-Still inside the pod:
-
-python3 passwd.py
-When prompted, enter:
-
-password123
-🔐 What Just Happened?
-The script adds a fake user hacked with UID 0 to /etc/passwd and /etc/shadow.
-
-This grants root-level access within the container.
-
-Demonstrates poor container hardening and potential container escape risk.
-
-🧠 Learning Outcome
-This lab shows the critical risk of writable sensitive files inside containers. When deployed in Kubernetes (even as non-root), misconfigured containers can lead to root-level access and lateral movement if proper isolation is not enforced.
-
-📌 Docker Image Used
-
-DockerHub: abhishekbv/passwd-lab:latest
-🧼 Cleanup
-
-kubectl delete pod vuln-passwd-pod -n passwd-lab
-kubectl delete ns passwd-lab
+This lab is for educational purposes only. Do not use these techniques on production systems or systems you don't own.

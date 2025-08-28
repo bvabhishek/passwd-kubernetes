@@ -6,7 +6,7 @@ metadata:
 spec:
   containers:
   - name: passwd-container
-    image: abhishekbv/passwd-lab-busybox:latest
+    image: passwd-lab-busybox:latest
     securityContext:
       runAsUser: 1000
       runAsGroup: 1000
