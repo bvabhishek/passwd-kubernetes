@@ -1,9 +1,9 @@
 # File: Dockerfile
-FROM ubuntu:20.04
+FROM debian:bullseye-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update && apt install -y \
+RUN apt-get update && apt-get install -y \
     sudo \
     passwd \
     python3 \

@@ -26,12 +26,29 @@ passwd-kubernetes/
 ## 🚀 Quick Start
 
 ### 1. Build Docker Images
+
+**Option A: Using the build script (Recommended)**
+```bash
+# This script handles rate limits and provides fallbacks
+./build_images.sh
+```
+
+**Option B: Manual build**
 ```bash
 # Build standard vulnerable image
 docker build -t passwd-lab:latest .
 
-# Build alpine-based image
+# Build alpine-based image  
 docker build -f Dockerfile-alpine -t passwd-lab-alpine:latest .
+```
+
+**Option C: If you hit Docker Hub rate limits**
+```bash
+# Login to Docker Hub first
+docker login
+
+# Then build normally
+docker build -t passwd-lab:latest .
 ```
 
 ### 2. Create Kubernetes Namespace
@@ -93,6 +110,26 @@ kubectl delete namespace passwd-lab
 ## 📚 Detailed Guide
 
 For step-by-step instructions and troubleshooting, see [TEST_CASES_README.md](TEST_CASES_README.md).
+
+## 🚨 Troubleshooting
+
+### Docker Hub Rate Limits
+If you encounter "toomanyrequests" errors:
+```bash
+# Solution 1: Login to Docker Hub
+docker login
+
+# Solution 2: Use the build script with fallbacks
+./build_images.sh
+
+# Solution 3: Wait 6 hours for rate limit to reset
+```
+
+### Alternative Base Images
+The Dockerfiles now use `debian:bullseye-slim` as a fallback, which is:
+- ✅ More accessible than Ubuntu
+- ✅ Less likely to hit rate limits
+- ✅ Still lightweight and secure
 
 ## ⚠️ Disclaimer
 
